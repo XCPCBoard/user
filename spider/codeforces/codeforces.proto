@@ -1,0 +1,18 @@
+syntax = "proto3";
+package codeforces.codeforces;
+
+option go_package = "./codeforces";
+
+message userInfo {
+	string        status = 1; // 请求响应状态
+	repeated info result = 2;
+}
+
+message info{
+	uint64 lastOnlineTimeSeconds = 1; // 上次登录时间戳
+	uint64 rating                = 2; // 当前Rating
+	string rank                  = 3; // Rating等级
+	uint64 maxRating             = 4; // 历史最大Rating
+	string maxRank               = 5; // 历史最高Rating等级
+	string handler               = 6; // 用户id
+}

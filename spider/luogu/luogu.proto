@@ -1,0 +1,30 @@
+syntax = "proto3";
+package luogu.luogu;
+
+option go_package = "./luogu";
+
+message UserShow {
+	int32       code        = 1; // 响应处理
+	currentData currentData = 2; // 当前用户信息
+}
+
+message currentData {
+	user                 user           = 2; // 用户信息
+	repeated passProblem passedProblems = 3; // 题目详情
+}
+
+message user {
+	int64  ranking               = 1; // 排名
+	int64  passedProblemCount    = 2; // 题目通过数
+	int64  submittedProblemCount = 3; // 题目提交数
+	int64  uid                   = 4;
+	string name                  = 5; // 用户名
+}
+
+message passProblem {
+	string pid        = 1; // 题目id
+	string title      = 2; // 题目标题
+	int64  difficulty = 3; // 题目难度值
+	int64  fullScore  = 4; // 满分
+	string type       = 5; // 类型
+}
