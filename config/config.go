@@ -31,8 +31,10 @@ type Storage struct {
 	Host     string `yaml:"host"`
 	Username string `yaml:"username"`
 	Password string `yaml:"password"`
+	Base     string `yaml:"base"`
 }
 
 type Config struct {
-	Storages map[string]Storage `yaml:"storages"`
+	Storages  map[string]Storage `yaml:"storages"`
+	AdminName string             `yaml:"adminName"`
 }
