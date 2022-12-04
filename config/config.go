@@ -8,7 +8,7 @@ import (
 
 func init() {
 	// 读取
-	f, err := os.Open(configPath)
+	f, err := os.Open(ConfigPath)
 	defer f.Close()
 	if err != nil {
 		log.Errorf("Init config Error %v", err)
@@ -24,7 +24,7 @@ func init() {
 
 var (
 	Conf       = Config{}
-	configPath = "./config/config.yaml"
+	ConfigPath = "./config/config.yaml"
 )
 
 type Storage struct {

@@ -12,6 +12,16 @@ import (
 // 主入口函数
 func main() {
 
+	//a, b := controller.CreatUserController("test2", "123456", "12")
+	//a, b := controller.DeleteUserController(12, "test1")
+	//a, b := controller.UpdateUserController(12, map[string]interface{}{
+	//	"name": "testA",
+	//})
+	a, b := controller.UpdateWebAccountController(12, map[string]interface{}{
+		"codeforces": "123123",
+	})
+
+	fmt.Printf("%v,%v", a, b)
 }
 
 func init() {
@@ -19,15 +29,11 @@ func init() {
 	//if err != nil {
 	//	panic(err)
 	//}
+	//dao.RedisClient = redisClient
 	dbClient, err := dao.NewDBClient()
 	if err != nil {
 		panic(err)
 	}
-	//dao.RedisClient = redisClient
 	dao.DBClient = dbClient
-
-	a, b := controller.CreatUser("test", "123456", "123")
-	//a, b := api.GetAllDataOfOneUser("a")
-	fmt.Printf("%v,%v", a, b)
 
 }

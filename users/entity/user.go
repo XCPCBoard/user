@@ -24,18 +24,13 @@ type User struct {
 	PhoneNumber string //手机号
 	QQNumber    string //qq号
 
-	CodeForces string    `gorm:"column:codeforces"` //cf
-	NowCoder   string    `gorm:"column:nowcoder"`   //牛客
-	LuoGu      string    `gorm:"column:luogu"`      //洛谷
-	AtCoder    string    `gorm:"column:atcoder"`    //atCoder
-	VJudge     string    `gorm:"column:vjudge"`     //VJ
-	CreatedAt  time.Time //创建时间
-	UpdatedAt  time.Time //更新时间
+	CreatedAt time.Time //创建时间
+	UpdatedAt time.Time //更新时间
 }
 
-//GORM框架会自动检索结构体名复数形式的表名来对齐
-//若表名不是结构体的复数，则利用下面的代码来对齐表名
-//func (User) TableName()string{
+//TableName GORM框架会自动检索结构体名复数形式的表名来对齐
+////若表名不是结构体的复数，则利用下面的代码来对齐表名
+//func (User) TableName() string {
 //	return userTableName
 //}
 
@@ -48,7 +43,7 @@ func (u *User) BeforeDelete(tx *gorm.DB) (err error) {
 }
 
 func (u *User) BeforeUpdate(tx *gorm.DB) (err error) {
-	if u.AtCoder == config.Conf.AdminName { //超管不能被更新
+	if u.Account == config.Conf.AdminName { //超管不能被更新
 		return errors.New("admin user not allowed to update")
 	}
 	return

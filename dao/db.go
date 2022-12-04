@@ -18,15 +18,15 @@ func NewDBClient() (*gorm.DB, error) {
 	mysqlConfig := config.Conf.Storages[mysqlDriver]
 
 	// 初始化连接
-	dsn := fmt.Sprintf("%v:%v@tcp(%v)/%v",
+	dsn := fmt.Sprintf("%v:%v@tcp(%v)/%v?parseTime=true",
 		mysqlConfig.Username, mysqlConfig.Password, mysqlConfig.Host, mysqlConfig.Base)
 
 	//dbClient, err := sql.Open(mysqlDriver, dsn)
-	dbClient, err := gorm.Open(mysql.Open(dsn), &gorm.Config{})
-
+	dBClient, err := gorm.Open(mysql.Open(dsn), &gorm.Config{})
 	if err != nil {
 		log.Errorf("Open Sql Error: %v", err)
 		return nil, err
 	}
-	return dbClient, nil
+
+	return dBClient, nil
 }
