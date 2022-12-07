@@ -11,7 +11,7 @@ const userTableName = "users"
 
 //User 用户变量
 type User struct {
-	Id uint //用户id
+	Id int //用户id
 
 	Account         string //账号
 	Keyword         string //密码

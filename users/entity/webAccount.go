@@ -5,7 +5,7 @@ import "time"
 const AccountTableName = "website_account"
 
 type Account struct {
-	Id uint //用户id
+	Id int //用户id
 
 	CodeForces string    `gorm:"column:codeforces"` //cf
 	NowCoder   string    `gorm:"column:nowcoder"`   //牛客

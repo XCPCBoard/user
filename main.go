@@ -13,14 +13,15 @@ import (
 func main() {
 
 	//a, b := controller.CreatUserController("test2", "123456", "12")
-	//a, b := controller.DeleteUserController(12, "test1")
+	//a, b := controller.DeleteUserController("121", "test1")
 	//a, b := controller.UpdateUserController(12, map[string]interface{}{
 	//	"name": "testA",
 	//})
-	a, b := controller.UpdateWebAccountController(12, map[string]interface{}{
-		"codeforces": "123123",
-	})
-
+	//a, b := controller.UpdateUserController(map[string]interface{}{
+	//	"id":   "13",
+	//	"name": "6666",
+	//})
+	a, b := controller.SelectUserController("112")
 	fmt.Printf("%v,%v", a, b)
 }
 

@@ -1,6 +1,8 @@
 package controller
 
 import (
+	log "github.com/sirupsen/logrus"
+	"strconv"
 	"user/users/entity"
 	"user/users/service"
 )
@@ -9,26 +11,28 @@ import (
 //@param account 账号
 //@param keyword 密码
 //@param email 邮箱
-func CreatUserController(account string, keyword string, email string) (bool, error) {
+func CreatUserController(account string, keyword string, email string) error {
 	user := entity.User{
 		Account: account,
 		Keyword: keyword,
 		Email:   email,
 	}
 
-	err := service.CreatUserInitService(&user)
-	if err != nil {
-		return false, err
-	}
-	return true, nil
+	return service.CreatUserInitService(&user)
+
 }
 
 //DeleteUserController 删除用户
 //@param id 用户id
 //@param account 用户账户
-func DeleteUserController(id uint, account string) (bool, error) {
+func DeleteUserController(id string, account string) error {
+	uid, err := strconv.Atoi(id)
+	if err != nil {
+		log.Errorf(err.Error())
+		return err
+	}
 	user := entity.User{
-		Id:      id,
+		Id:      uid,
 		Account: account,
 	}
 	return service.DeleteUserService(&user)
@@ -36,18 +40,16 @@ func DeleteUserController(id uint, account string) (bool, error) {
 
 //UpdateUserController 更新用户
 //@param id 用户id
-func UpdateUserController(id uint, user map[string]interface{}) (bool, error) {
-	//检查是否包含主键
-	if _, ok := user["id"]; ok {
-		return false, nil
-	}
-	return service.UpdateUserService(id, user)
+func UpdateUserController(user map[string]interface{}) error {
+
+	return service.UpdateUserService(user)
 }
 
 //SelectUserController 查询用户
 //@param id 用户id
 //@return map[string]interface{} 用户信息（除去了密码）
-func SelectUserController(id uint) (map[string]interface{}, error) {
+func SelectUserController(id string) (map[string]interface{}, error) {
+
 	user := map[string]interface{}{}
 	err := service.SelectUserService(id, &user)
 	if err != nil {

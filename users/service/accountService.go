@@ -1,9 +1,12 @@
 package service
 
 import (
+	"errors"
+	"fmt"
 	log "github.com/sirupsen/logrus"
 	"user/dao"
 	"user/users/entity"
+	"user/users/util"
 )
 
 /*
@@ -13,39 +16,31 @@ import (
 //UpdateWebAccountService 更新用户网站账户 bool判断是否成功，error判断错误
 //@param account 用户信息（注意不要包含主键）
 //@param id 用户id
-func UpdateWebAccountService(id uint, account map[string]interface{}) (bool, error) {
-	//防止包含主键导致数据库更新错误
-	if _, ok := account["id"]; ok {
-		account["id"] = id
+func UpdateWebAccountService(account map[string]interface{}) error {
+
+	//检查是否包含主键
+	if _, ok := account["id"]; !ok {
+		err := errors.New(fmt.Sprintf("can't find account's id:%v", account["id"]))
+		log.Errorf(err.Error())
+		return err
 	}
 	//注意Model里结构体
 	res := dao.DBClient.Model(&entity.Account{}).
-		Where("id", id).Updates(account)
+		Where("id = ?", account["id"]).Updates(account)
 
 	//error
-	if res.Error != nil {
-		log.Errorf("function 'UpdateWebAccount' failed,  %v", res.Error)
-		return false, res.Error
-	} else if res.RowsAffected == 0 {
-		//not find
-		log.Errorf("the user to be deleted could not be found")
-		return false, nil
-	}
-	return true, nil
+	return util.CreatError(res,
+		fmt.Sprintf("the account to be deleted could not be found:%v", account["id"]))
 }
 
 //SelectWebAccountService 查询用户网站账户
 //@param id 用户id
-func SelectWebAccountService(id uint) (map[string]interface{}, error) {
+func SelectWebAccountService(id string, account *map[string]interface{}) error {
 
-	account := map[string]interface{}{}
 	res := dao.DBClient.Model(&entity.Account{}).
-		First(&account, id)
+		Find(account, id)
 	//error
-	if res.Error != nil {
-		log.Errorf("function 'SelectWebAccountService' failed,  %v", res.Error)
-		return nil, res.Error
-	}
-	return account, nil
+	return util.CreatError(res,
+		fmt.Sprintf("the account to be deleted could not be found:%v", id))
 
 }
