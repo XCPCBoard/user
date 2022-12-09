@@ -3,10 +3,10 @@ package main
 import (
 	"fmt"
 	_ "github.com/FengZhg/go_tools/gin_logrus"
-	_ "user/config"
-	"user/controller"
-	"user/dao"
-	_ "user/dao"
+	"github.com/XCPCBoard/user/controller"
+	"github.com/XCPCBoard/user/dao"
+	_ "github.com/XCPCBoard/user/dao"
+	_ "github.com/XCPCBoard/utils"
 )
 
 // 主入口函数

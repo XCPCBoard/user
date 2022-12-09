@@ -1,28 +1,28 @@
 package service
 
 import (
+	"XCPCBoard/user/dao"
+	"XCPCBoard/user/entity"
+	"XCPCBoard/user/util"
 	"crypto/md5"
 	"errors"
 	"fmt"
 	log "github.com/sirupsen/logrus"
 	"gorm.io/gorm"
 	"time"
-	"user/dao"
-	entity2 "user/entity"
-	"user/util"
 )
 
 const salt = "19491001"
 
 //CreatUserInitService 新建账户
 //同时会创建Account表中的数据
-func CreatUserInitService(user *entity2.User) error {
+func CreatUserInitService(user *entity.User) error {
 
 	//获取当前时间，为密码加盐
 	user.CreatedAt = time.Now()
 	keyword := []byte(user.Keyword + user.CreatedAt.String() + salt)
 	user.Keyword = fmt.Sprintf("%x", md5.Sum(keyword))
-	account := entity2.Account{}
+	account := entity.Account{}
 
 	err := dao.DBClient.Transaction(func(tx *gorm.DB) error {
 
@@ -30,7 +30,7 @@ func CreatUserInitService(user *entity2.User) error {
 			return creatUser.Error
 		}
 		//查询刚刚插入的数据
-		userX := entity2.User{}
+		userX := entity.User{}
 		check := tx.Where("account", user.Account).Find(&userX)
 		if check.Error != nil {
 			tx.Rollback()
@@ -53,7 +53,7 @@ func CreatUserInitService(user *entity2.User) error {
 
 //DeleteUserService 删除用户
 //同时会删除Account表中的数据
-func DeleteUserService(user *entity2.User) error {
+func DeleteUserService(user *entity.User) error {
 
 	//begin Transaction
 	tx := dao.DBClient.Begin()
@@ -85,7 +85,7 @@ func DeleteUserService(user *entity2.User) error {
 	}
 
 	//delete webAccount
-	res = tx.Delete(&entity2.Account{}, user.Id)
+	res = tx.Delete(&entity.Account{}, user.Id)
 	if res.Error != nil {
 		log.Errorf("function 'DeleteUserService' delete account failed,  %v", res.Error)
 		tx.Rollback()
@@ -111,7 +111,7 @@ func UpdateUserService(user map[string]interface{}) error {
 		log.Errorf(err.Error())
 		return err
 	}
-	res := dao.DBClient.Model(&entity2.User{}).
+	res := dao.DBClient.Model(&entity.User{}).
 		Where("id = ?", user["id"]).Updates(user)
 
 	//error
@@ -123,7 +123,7 @@ func UpdateUserService(user map[string]interface{}) error {
 //@param user 用户数据指针
 func SelectUserService(id string, user *map[string]interface{}) error {
 
-	res := dao.DBClient.Model(&entity2.User{}).Find(user, id)
+	res := dao.DBClient.Model(&entity.User{}).Find(user, id)
 	//error
 	err := util.CreatError(res, fmt.Sprintf("the user to be deleted could not be found:%v", id))
 

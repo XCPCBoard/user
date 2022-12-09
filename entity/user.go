@@ -1,10 +1,10 @@
 package entity
 
 import (
+	"XCPCBoard/user/config"
 	"errors"
 	"gorm.io/gorm"
 	"time"
-	"user/config"
 )
 
 const userTableName = "users"

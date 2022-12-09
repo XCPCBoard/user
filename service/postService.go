@@ -1,12 +1,12 @@
 package service
 
 import (
+	"XCPCBoard/user/dao"
+	"XCPCBoard/user/entity"
+	"XCPCBoard/user/util"
 	"errors"
 	"fmt"
 	log "github.com/sirupsen/logrus"
-	"user/dao"
-	"user/entity"
-	"user/util"
 )
 
 //CreatePostService 创建评论
