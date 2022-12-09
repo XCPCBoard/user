@@ -1,7 +1,7 @@
 package controller
 
 import (
-	"user/users/service"
+	"user/service"
 )
 
 //UpdateWebAccountController 更新用户网站账户 bool判断是否成功，error判断错误

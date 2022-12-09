@@ -5,8 +5,8 @@ import (
 	"fmt"
 	log "github.com/sirupsen/logrus"
 	"user/dao"
-	"user/users/entity"
-	"user/users/util"
+	"user/entity"
+	"user/util"
 )
 
 //CreatePostService 创建评论
@@ -42,6 +42,9 @@ func UpdatePostService(post map[string]interface{}) error {
 	return util.CreatError(res, fmt.Sprintf("can not find post:%v", post["id"]))
 }
 
+//SelectPostService 查询post
+//@param id 评论id
+//@param post 存放post的实体map
 func SelectPostService(id string, post *map[string]interface{}) error {
 
 	res := dao.DBClient.Model(&entity.Post{}).Find(post, id)

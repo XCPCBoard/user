@@ -11,6 +11,7 @@ import (
 //@param msg 未找到数据时的错误信息
 func CreatError(res *gorm.DB, msg string) error {
 	if res.Error != nil {
+		log.Errorf(res.Error.Error())
 		return res.Error
 	} else if res.RowsAffected == 0 {
 		err := errors.New(msg)

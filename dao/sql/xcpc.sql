@@ -22,7 +22,7 @@ CREATE UNIQUE INDEX check_email ON users(email);
 DROP TABLE IF EXISTS posts;
 CREATE TABLE posts(
                       id INT NOT NULL AUTO_INCREMENT  COMMENT '主键id' ,
-                      user_id VARCHAR(64) NOT NULL   COMMENT '账户id' ,
+                      user_id VARCHAR(64) NOT NULL   COMMENT '用户id' ,
                       title VARCHAR(64)    COMMENT '帖子标题' ,
                       content VARCHAR(1500)    COMMENT '帖子内容' ,
                       note VARCHAR(64)    COMMENT '备注（备用字段）' ,

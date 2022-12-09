@@ -3,8 +3,8 @@ package controller
 import (
 	log "github.com/sirupsen/logrus"
 	"strconv"
-	"user/users/entity"
-	"user/users/service"
+	"user/entity"
+	"user/service"
 )
 
 //CreatUserController 新建账户

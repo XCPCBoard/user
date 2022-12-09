@@ -5,8 +5,8 @@ import (
 	"fmt"
 	log "github.com/sirupsen/logrus"
 	"user/dao"
-	"user/users/entity"
-	"user/users/util"
+	"user/entity"
+	"user/util"
 )
 
 /*

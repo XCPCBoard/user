@@ -4,9 +4,9 @@ import (
 	"fmt"
 	_ "github.com/FengZhg/go_tools/gin_logrus"
 	_ "user/config"
+	"user/controller"
 	"user/dao"
 	_ "user/dao"
-	"user/users/controller"
 )
 
 // 主入口函数
@@ -21,16 +21,16 @@ func main() {
 	//	"id":   "13",
 	//	"name": "6666",
 	//})
-	a, b := controller.SelectUserController("112")
+	a, b := controller.SelectPostController("1")
 	fmt.Printf("%v,%v", a, b)
 }
 
 func init() {
-	//redisClient, err := dao.NewRedisClient()
-	//if err != nil {
-	//	panic(err)
-	//}
-	//dao.RedisClient = redisClient
+	redisClient, err := dao.NewRedisClient()
+	if err != nil {
+		panic(err)
+	}
+	dao.RedisClient = redisClient
 	dbClient, err := dao.NewDBClient()
 	if err != nil {
 		panic(err)
