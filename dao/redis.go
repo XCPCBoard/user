@@ -2,9 +2,9 @@ package dao
 
 import (
 	"context"
+	"github.com/XCPCBoard/user/config"
 	"github.com/go-redis/redis/v8"
 	log "github.com/sirupsen/logrus"
-	"user/config"
 )
 
 var RedisClient *redis.Client

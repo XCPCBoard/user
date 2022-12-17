@@ -6,7 +6,6 @@ import (
 	"github.com/XCPCBoard/user/controller"
 	"github.com/XCPCBoard/user/dao"
 	_ "github.com/XCPCBoard/user/dao"
-	_ "github.com/XCPCBoard/utils"
 )
 
 // 主入口函数

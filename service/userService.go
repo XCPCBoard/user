@@ -1,12 +1,11 @@
 package service
 
 import (
-	"XCPCBoard/user/dao"
-	"XCPCBoard/user/entity"
-	"XCPCBoard/user/util"
 	"crypto/md5"
 	"errors"
 	"fmt"
+	"github.com/XCPCBoard/user/dao"
+	"github.com/XCPCBoard/user/entity"
 	log "github.com/sirupsen/logrus"
 	"gorm.io/gorm"
 	"time"
@@ -115,7 +114,7 @@ func UpdateUserService(user map[string]interface{}) error {
 		Where("id = ?", user["id"]).Updates(user)
 
 	//error
-	return util.CreatError(res, fmt.Sprintf("the user to be deleted could not be found:%v", user["id"]))
+	return CreatError(res, fmt.Sprintf("the user to be deleted could not be found:%v", user["id"]))
 }
 
 //SelectUserService 查询用户
@@ -125,7 +124,7 @@ func SelectUserService(id string, user *map[string]interface{}) error {
 
 	res := dao.DBClient.Model(&entity.User{}).Find(user, id)
 	//error
-	err := util.CreatError(res, fmt.Sprintf("the user to be deleted could not be found:%v", id))
+	err := CreatError(res, fmt.Sprintf("the user to be deleted could not be found:%v", id))
 
 	//删掉密码
 	if err == nil {
@@ -134,4 +133,26 @@ func SelectUserService(id string, user *map[string]interface{}) error {
 
 	return err
 
+}
+
+func SelectUserByPage() error {
+	//var number int
+	//if err := CountAllUser(&number); err != nil {
+	//	return err
+	//}
+	//pageNumber := number / 100
+	//go func() {
+	//
+	//}()
+	//dao.DBClient.Scopes(Paginate()).Find(&users)
+	return nil
+}
+
+func CountAllUser(number *int) error {
+	res := dao.DBClient.Raw(fmt.Sprintf("select count(*) from %v", entity.UserTableName)).Scan(number)
+	if res.Error != nil {
+		log.Errorf(res.Error.Error())
+		return res.Error
+	}
+	return nil
 }

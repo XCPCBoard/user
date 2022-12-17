@@ -1,11 +1,10 @@
 package service
 
 import (
-	"XCPCBoard/user/dao"
-	"XCPCBoard/user/entity"
-	"XCPCBoard/user/util"
 	"errors"
 	"fmt"
+	"github.com/XCPCBoard/user/dao"
+	"github.com/XCPCBoard/user/entity"
 	log "github.com/sirupsen/logrus"
 )
 
@@ -25,7 +24,7 @@ func CreatePostService(post *entity.Post) error {
 func DeletePostService(id string) error {
 
 	res := dao.DBClient.Delete(&entity.Post{}, id)
-	return util.CreatError(res, fmt.Sprintf("can not find post:%v", id))
+	return CreatError(res, fmt.Sprintf("can not find post:%v", id))
 }
 
 //UpdatePostService 更新评论
@@ -39,7 +38,7 @@ func UpdatePostService(post map[string]interface{}) error {
 	}
 
 	res := dao.DBClient.Model(&entity.Post{}).Where("id = ?", post["id"]).Updates(post)
-	return util.CreatError(res, fmt.Sprintf("can not find post:%v", post["id"]))
+	return CreatError(res, fmt.Sprintf("can not find post:%v", post["id"]))
 }
 
 //SelectPostService 查询post
@@ -48,5 +47,5 @@ func UpdatePostService(post map[string]interface{}) error {
 func SelectPostService(id string, post *map[string]interface{}) error {
 
 	res := dao.DBClient.Model(&entity.Post{}).Find(post, id)
-	return util.CreatError(res, fmt.Sprintf("can not find post:%v", id))
+	return CreatError(res, fmt.Sprintf("can not find post:%v", id))
 }

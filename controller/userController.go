@@ -1,8 +1,8 @@
 package controller
 
 import (
-	"XCPCBoard/user/entity"
-	"XCPCBoard/user/service"
+	"github.com/XCPCBoard/user/entity"
+	"github.com/XCPCBoard/user/service"
 	log "github.com/sirupsen/logrus"
 	"strconv"
 )

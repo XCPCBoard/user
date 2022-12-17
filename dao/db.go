@@ -2,10 +2,10 @@ package dao
 
 import (
 	"fmt"
+	"github.com/XCPCBoard/user/config"
 	log "github.com/sirupsen/logrus"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
-	"user/config"
 )
 
 var DBClient *gorm.DB

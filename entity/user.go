@@ -1,13 +1,13 @@
 package entity
 
 import (
-	"XCPCBoard/user/config"
 	"errors"
+	"github.com/XCPCBoard/user/config"
 	"gorm.io/gorm"
 	"time"
 )
 
-const userTableName = "users"
+const UserTableName = "users"
 
 //User 用户变量
 type User struct {
@@ -31,7 +31,7 @@ type User struct {
 //TableName GORM框架会自动检索结构体名复数形式的表名来对齐
 ////若表名不是结构体的复数，则利用下面的代码来对齐表名
 //func (User) TableName() string {
-//	return userTableName
+//	return UserTableName
 //}
 
 //BeforeDelete 钩子函数

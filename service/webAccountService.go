@@ -1,11 +1,10 @@
 package service
 
 import (
-	"XCPCBoard/user/dao"
-	"XCPCBoard/user/entity"
-	"XCPCBoard/user/util"
 	"errors"
 	"fmt"
+	"github.com/XCPCBoard/user/dao"
+	"github.com/XCPCBoard/user/entity"
 	log "github.com/sirupsen/logrus"
 )
 
@@ -29,7 +28,7 @@ func UpdateWebAccountService(account map[string]interface{}) error {
 		Where("id = ?", account["id"]).Updates(account)
 
 	//error
-	return util.CreatError(res,
+	return CreatError(res,
 		fmt.Sprintf("the account to be deleted could not be found:%v", account["id"]))
 }
 
@@ -40,7 +39,7 @@ func SelectWebAccountService(id string, account *map[string]interface{}) error {
 	res := dao.DBClient.Model(&entity.Account{}).
 		Find(account, id)
 	//error
-	return util.CreatError(res,
+	return CreatError(res,
 		fmt.Sprintf("the account to be deleted could not be found:%v", id))
 
 }
