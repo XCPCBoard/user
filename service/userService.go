@@ -4,12 +4,12 @@ import (
 	"crypto/md5"
 	"errors"
 	"fmt"
+	"github.com/XCPCBoard/user/dao"
+	entity2 "github.com/XCPCBoard/user/entity"
+	"github.com/XCPCBoard/user/util"
 	log "github.com/sirupsen/logrus"
 	"gorm.io/gorm"
 	"time"
-	"user/dao"
-	entity2 "user/entity"
-	"user/util"
 )
 
 const salt = "19491001"

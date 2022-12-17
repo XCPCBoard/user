@@ -1,10 +1,10 @@
 package controller
 
 import (
+	"github.com/XCPCBoard/user/entity"
+	"github.com/XCPCBoard/user/service"
 	log "github.com/sirupsen/logrus"
 	"strconv"
-	"user/entity"
-	"user/service"
 )
 
 //CreatePostController 创建评论

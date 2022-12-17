@@ -3,10 +3,10 @@ package service
 import (
 	"errors"
 	"fmt"
+	"github.com/XCPCBoard/user/dao"
+	"github.com/XCPCBoard/user/entity"
+	"github.com/XCPCBoard/user/util"
 	log "github.com/sirupsen/logrus"
-	"user/dao"
-	"user/entity"
-	"user/util"
 )
 
 //CreatePostService 创建评论

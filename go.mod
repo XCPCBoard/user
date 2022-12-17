@@ -1,4 +1,4 @@
-module user
+module github.com/XCPCBoard/user
 
 go 1.18
 
