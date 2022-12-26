@@ -1,9 +1,7 @@
 package main
 
 import (
-	"fmt"
 	_ "github.com/FengZhg/go_tools/gin_logrus"
-	"github.com/XCPCBoard/user/controller"
 	"github.com/XCPCBoard/user/dao"
 	_ "github.com/XCPCBoard/user/dao"
 )
@@ -20,8 +18,8 @@ func main() {
 	//	"id":   "13",
 	//	"name": "6666",
 	//})
-	a, b := controller.SelectPostController("1")
-	fmt.Printf("%v,%v", a, b)
+	//a, b := api.SelectPostController("1")
+	//fmt.Printf("%v,%v", a, b)
 }
 
 func init() {

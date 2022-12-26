@@ -13,10 +13,15 @@ import (
 
 const salt = "19491001"
 
-//CreatUserInitService 新建账户
+//CreateUserInitService 新建账户
 //同时会创建Account表中的数据
-func CreatUserInitService(user *entity.User) error {
+func CreateUserInitService(_account string, _keyword string, _email string) error {
 
+	user := entity.User{
+		Account: _account,
+		Keyword: _keyword,
+		Email:   _email,
+	}
 	//获取当前时间，为密码加盐
 	user.CreatedAt = time.Now()
 	keyword := []byte(user.Keyword + user.CreatedAt.String() + salt)
@@ -44,7 +49,7 @@ func CreatUserInitService(user *entity.User) error {
 	})
 
 	if err != nil {
-		log.Errorf("function 'CreatUserInitService' failed,  %v", err)
+		log.Errorf("Create User Init failed,  %v", err)
 		return err
 	}
 	return nil
@@ -63,7 +68,7 @@ func DeleteUserService(user *entity.User) error {
 	}()
 
 	if tx.Error != nil {
-		log.Errorf("function 'DeleteUserService' Transaction failed,  %v", tx.Error)
+		log.Errorf(" delete user failed,  %v", tx.Error)
 		return tx.Error
 	}
 
@@ -72,7 +77,7 @@ func DeleteUserService(user *entity.User) error {
 
 	//error
 	if res.Error != nil {
-		log.Errorf("function 'DeleteUserService' delete user failed,  %v", res.Error)
+		log.Errorf("delete user failed,  %v", res.Error)
 		tx.Rollback()
 		return res.Error
 	} else if res.RowsAffected == 0 {
@@ -86,7 +91,7 @@ func DeleteUserService(user *entity.User) error {
 	//delete webAccount
 	res = tx.Delete(&entity.Account{}, user.Id)
 	if res.Error != nil {
-		log.Errorf("function 'DeleteUserService' delete account failed,  %v", res.Error)
+		log.Errorf("delete account failed,  %v", res.Error)
 		tx.Rollback()
 		return res.Error
 	} else if res.RowsAffected == 0 {
@@ -103,7 +108,7 @@ func DeleteUserService(user *entity.User) error {
 //UpdateUserService 更新用户
 //@param user 用户信息（注意不要包含主键）
 //@param id 用户id
-func UpdateUserService(user map[string]interface{}) error {
+func UpdateUserService(user map[string]string) error {
 	//检查是否包含主键
 	if _, ok := user["id"]; !ok {
 		err := errors.New("can't find user's id")

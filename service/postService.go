@@ -29,7 +29,7 @@ func DeletePostService(id string) error {
 
 //UpdatePostService 更新评论
 //@param post 评论参数
-func UpdatePostService(post map[string]interface{}) error {
+func UpdatePostService(post map[string]string) error {
 	//检查是否包含主键
 	if _, ok := post["id"]; !ok {
 		err := errors.New("can't find post's id")
