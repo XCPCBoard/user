@@ -1,7 +1,11 @@
 package service
 
 import (
+	"crypto/md5"
 	"errors"
+	"fmt"
+	"github.com/XCPCBoard/common/config"
+	"github.com/XCPCBoard/user/entity"
 	log "github.com/sirupsen/logrus"
 	"gorm.io/gorm"
 )
@@ -36,4 +40,10 @@ func CreatError(res *gorm.DB, msg string) error {
 		return err
 	}
 	return nil
+}
+
+//GetPassWord 获取加密后的密码
+func GetPassWord(keyword string, user *entity.User) string {
+	res := []byte(keyword + user.CreatedAt.String() + config.Conf.Secret)
+	return fmt.Sprintf("%x", md5.Sum(res))
 }

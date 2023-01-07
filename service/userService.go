@@ -1,47 +1,50 @@
 package service
 
 import (
-	"crypto/md5"
 	"errors"
 	"fmt"
-	"github.com/XCPCBoard/user/dao"
+	"github.com/XCPCBoard/common/dao"
 	"github.com/XCPCBoard/user/entity"
 	log "github.com/sirupsen/logrus"
 	"gorm.io/gorm"
 	"time"
 )
 
-const salt = "19491001"
+type UserService struct {
+}
+
+//**********************************************************
+//			    			CRUD
+//**********************************************************
 
 //CreateUserInitService 新建账户
 //同时会创建Account表中的数据
 func CreateUserInitService(_account string, _keyword string, _email string) error {
 
-	user := entity.User{
+	user := &entity.User{
 		Account: _account,
 		Keyword: _keyword,
 		Email:   _email,
 	}
 	//获取当前时间，为密码加盐
 	user.CreatedAt = time.Now()
-	keyword := []byte(user.Keyword + user.CreatedAt.String() + salt)
-	user.Keyword = fmt.Sprintf("%x", md5.Sum(keyword))
-	account := entity.Account{}
+	user.Keyword = GetPassWord(user.Keyword, user)
+	account := &entity.Account{}
 
 	err := dao.DBClient.Transaction(func(tx *gorm.DB) error {
 
-		if creatUser := tx.Create(user); creatUser.Error != nil {
+		if creatUser := tx.Omit("id").Create(user); creatUser.Error != nil {
 			return creatUser.Error
 		}
 		//查询刚刚插入的数据
-		userX := entity.User{}
-		check := tx.Where("account", user.Account).Find(&userX)
+		userX := &entity.User{}
+		check := tx.Where("account", user.Account).Find(userX)
 		if check.Error != nil {
 			tx.Rollback()
 			return check.Error
 		}
 		account.Id = userX.Id
-		if acc := tx.Create(&account); acc.Error != nil {
+		if acc := tx.Create(account); acc.Error != nil {
 			tx.Rollback()
 			return acc.Error
 		}
@@ -72,8 +75,8 @@ func DeleteUserService(user *entity.User) error {
 		return tx.Error
 	}
 
-	//delete where id = ? and account = ?
-	res := tx.Where("account", user.Account).Delete(user)
+	//delete where id = ?
+	res := tx.Delete(user)
 
 	//error
 	if res.Error != nil {
@@ -108,21 +111,16 @@ func DeleteUserService(user *entity.User) error {
 //UpdateUserService 更新用户
 //@param user 用户信息（注意不要包含主键）
 //@param id 用户id
-func UpdateUserService(user map[string]string) error {
-	//检查是否包含主键
-	if _, ok := user["id"]; !ok {
-		err := errors.New("can't find user's id")
-		log.Errorf(err.Error())
-		return err
-	}
+func UpdateUserService(id string, user *entity.User) error {
+
 	res := dao.DBClient.Model(&entity.User{}).
-		Where("id = ?", user["id"]).Updates(user)
+		Where("id = ?", id).Updates(user)
 
 	//error
-	return CreatError(res, fmt.Sprintf("the user to be deleted could not be found:%v", user["id"]))
+	return CreatError(res, fmt.Sprintf("the user to be deleted could not be found:%v", id))
 }
 
-//SelectUserService 查询用户
+//SelectUserService 根据id查询用户（不包含密码)
 //@param id 用户id
 //@param user 用户数据指针
 func SelectUserService(id string, user *map[string]interface{}) error {
@@ -137,8 +135,45 @@ func SelectUserService(id string, user *map[string]interface{}) error {
 	}
 
 	return err
+}
+
+//SelectUserServiceByEmail 根据email查询用户（不包含密码)
+//@param email 用户email
+//@param user 用户数据指针
+func SelectUserServiceByEmail(email string, user *entity.User) error {
+
+	res := dao.DBClient.Model(&entity.User{}).Where("email = ?", email).Find(user)
+	//error
+	err := CreatError(res, fmt.Sprintf("the user to be deleted could not be found by email:%v", email))
+
+	//不必删掉密码，还要对比
+	return err
+}
+
+//**********************************************************
+//			    			Auth
+//**********************************************************
+
+//SelectUserIsAdmin 查询用户是否为管理员，是则返回true
+func SelectUserIsAdmin(id string) (bool, error) {
+	user := map[string]interface{}{}
+	if err := SelectUserService(id, &user); err != nil {
+		return false, err
+	}
+	if isAdmin, ok2 := user["is_administrator"]; !ok2 || fmt.Sprintf("%v", isAdmin) != "1" {
+		if !ok2 {
+			log.Println("请求的用户id找不到is_administrator字段，id:%v", ok2)
+		}
+		return false, nil
+	}
+	//无需进log
+	return true, nil
 
 }
+
+//**********************************************************
+//			    			select all
+//**********************************************************
 
 func SelectUserByPage() error {
 	//var number int

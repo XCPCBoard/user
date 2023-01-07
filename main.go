@@ -2,8 +2,12 @@ package main
 
 import (
 	_ "github.com/FengZhg/go_tools/gin_logrus"
-	"github.com/XCPCBoard/user/dao"
-	_ "github.com/XCPCBoard/user/dao"
+	"github.com/XCPCBoard/api/http/middleware"
+	"github.com/XCPCBoard/common/config"
+	"github.com/XCPCBoard/common/dao"
+	_ "github.com/XCPCBoard/common/dao"
+	"github.com/XCPCBoard/user/api"
+	"github.com/gin-gonic/gin"
 )
 
 // 主入口函数
@@ -20,9 +24,18 @@ func main() {
 	//})
 	//a, b := api.SelectPostController("1")
 	//fmt.Printf("%v,%v", a, b)
+
+	engine := gin.Default()
+	engine.Use(middleware.ErrorHandler())
+	api.BuildUserRouteEngine(engine)
+	engine.Run()
+
 }
 
 func init() {
+	//依赖包
+	config.BuildConfig("./config.yaml")
+
 	redisClient, err := dao.NewRedisClient()
 	if err != nil {
 		panic(err)
@@ -33,5 +46,4 @@ func init() {
 		panic(err)
 	}
 	dao.DBClient = dbClient
-
 }

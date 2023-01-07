@@ -3,7 +3,7 @@ package service
 import (
 	"errors"
 	"fmt"
-	"github.com/XCPCBoard/user/dao"
+	"github.com/XCPCBoard/common/dao"
 	"github.com/XCPCBoard/user/entity"
 	log "github.com/sirupsen/logrus"
 )
@@ -29,16 +29,16 @@ func DeletePostService(id string) error {
 
 //UpdatePostService 更新评论
 //@param post 评论参数
-func UpdatePostService(post map[string]string) error {
-	//检查是否包含主键
-	if _, ok := post["id"]; !ok {
-		err := errors.New("can't find post's id")
+func UpdatePostService(post *entity.Post) error {
+	//检查主键是否为0
+	if post.Id == 0 {
+		err := errors.New("post's id should not be 0")
 		log.Errorf(err.Error())
 		return err
 	}
 
-	res := dao.DBClient.Model(&entity.Post{}).Where("id = ?", post["id"]).Updates(post)
-	return CreatError(res, fmt.Sprintf("can not find post:%v", post["id"]))
+	res := dao.DBClient.Model(&entity.Post{}).Where("id = ?", post.Id).Updates(post)
+	return CreatError(res, fmt.Sprintf("can not find post:%v", post.Id))
 }
 
 //SelectPostService 查询post
