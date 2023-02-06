@@ -1,11 +1,11 @@
 package service
 
 import (
-	"errors"
 	"fmt"
 	"github.com/XCPCBoard/common/dao"
+	"github.com/XCPCBoard/common/errors"
+	"github.com/XCPCBoard/common/logger"
 	"github.com/XCPCBoard/user/entity"
-	log "github.com/sirupsen/logrus"
 	"gorm.io/gorm"
 	"time"
 )
@@ -14,12 +14,12 @@ type UserService struct {
 }
 
 //**********************************************************
-//			    			CRUD
+//			    			CRUD						  //
 //**********************************************************
 
-//CreateUserInitService 新建账户
-//同时会创建Account表中的数据
-func CreateUserInitService(_account string, _keyword string, _email string) error {
+// CreateUserInitService 新建账户
+// 同时会创建Account表中的数据
+func CreateUserInitService(_account string, _keyword string, _email string) *errors.MyError {
 
 	user := &entity.User{
 		Account: _account,
@@ -43,6 +43,7 @@ func CreateUserInitService(_account string, _keyword string, _email string) erro
 			tx.Rollback()
 			return check.Error
 		}
+		//网站id=user id
 		account.Id = userX.Id
 		if acc := tx.Create(account); acc.Error != nil {
 			tx.Rollback()
@@ -52,15 +53,15 @@ func CreateUserInitService(_account string, _keyword string, _email string) erro
 	})
 
 	if err != nil {
-		log.Errorf("Create User Init failed,  %v", err)
-		return err
+		logger.Logger.Error("Create User and account failed", err, 0, fmt.Sprintf("user:%#v", user))
+		return errors.GetError(errors.VALID_ERROR, "创建用户错误:"+err.Error())
 	}
 	return nil
 }
 
-//DeleteUserService 删除用户
-//同时会删除Account表中的数据
-func DeleteUserService(user *entity.User) error {
+// DeleteUserService 删除用户
+// 同时会删除Account表中的数据
+func DeleteUserService(user *entity.User) *errors.MyError {
 
 	//begin Transaction
 	tx := dao.DBClient.Begin()
@@ -71,63 +72,54 @@ func DeleteUserService(user *entity.User) error {
 	}()
 
 	if tx.Error != nil {
-		log.Errorf(" delete user failed,  %v", tx.Error)
-		return tx.Error
+		logger.Logger.Error("delete user failed", tx.Error, 0, fmt.Sprintf("user id:%d", user.Id))
+		return errors.GetError(errors.INNER_ERROR, "删除用户错误")
 	}
 
 	//delete where id = ?
 	res := tx.Delete(user)
 
 	//error
-	if res.Error != nil {
-		log.Errorf("delete user failed,  %v", res.Error)
-		tx.Rollback()
-		return res.Error
-	} else if res.RowsAffected == 0 {
-		//not find
-		err := errors.New(fmt.Sprintf("the user to be deleted could not be found:%v", user.Id))
-		log.Errorf(err.Error())
+	if err := CreatError(res, "delete user error",
+		fmt.Sprintf("user id:%d", user.Id)); err != nil {
 		tx.Rollback()
 		return err
 	}
 
 	//delete webAccount
 	res = tx.Delete(&entity.Account{}, user.Id)
-	if res.Error != nil {
-		log.Errorf("delete account failed,  %v", res.Error)
-		tx.Rollback()
-		return res.Error
-	} else if res.RowsAffected == 0 {
-		//not find
-		err := errors.New(fmt.Sprintf("the account to be deleted could not be found:%v", user.Id))
-		log.Errorf(err.Error())
+	if err := CreatError(res, "delete web account error",
+		fmt.Sprintf("user id :%d", user.Id)); err != nil {
 		tx.Rollback()
 		return err
 	}
-
-	return tx.Commit().Error
+	if com := tx.Commit(); com.Error != nil {
+		logger.Logger.Error("删除用户时，提交事务错误", com.Error, 0, fmt.Sprintf("id:%d", user.Id))
+	}
+	return nil
 }
 
-//UpdateUserService 更新用户
-//@param user 用户信息（注意不要包含主键）
-//@param id 用户id
-func UpdateUserService(id string, user *entity.User) error {
+// UpdateUserService 更新用户
+// @param user 用户信息（注意不要包含主键）
+// @param id 用户id
+func UpdateUserService(id string, user *entity.User) *errors.MyError {
 
+	//强制为0
+	user.Id = 0
 	res := dao.DBClient.Model(&entity.User{}).
 		Where("id = ?", id).Updates(user)
-
 	//error
-	return CreatError(res, fmt.Sprintf("the user to be deleted could not be found:%v", id))
+	return CreatError(res, "Update user error", fmt.Sprintf("{user id:%v }", id))
 }
 
-//SelectUserService 根据id查询用户（不包含密码)
-//@param id 用户id
-//@param user 用户数据指针
-func SelectUserService(id string, user *map[string]interface{}) error {
+// SelectUserServiceWithOutPassword 根据id查询用户（不包含密码)
+// @param id 用户id
+// @param user 用户数据指针
+func SelectUserServiceWithOutPassword(id string, user *map[string]interface{}) *errors.MyError {
 
 	res := dao.DBClient.Model(&entity.User{}).Find(user, id)
 	//error
-	err := CreatError(res, fmt.Sprintf("the user to be deleted could not be found:%v", id))
+	err := CreatError(res, "select User Service error", fmt.Sprintf("user id:%v", id))
 
 	//删掉密码
 	if err == nil {
@@ -137,14 +129,14 @@ func SelectUserService(id string, user *map[string]interface{}) error {
 	return err
 }
 
-//SelectUserServiceByEmail 根据email查询用户（不包含密码)
-//@param email 用户email
-//@param user 用户数据指针
-func SelectUserServiceByEmail(email string, user *entity.User) error {
+// SelectUserServiceByEmail 根据email查询用户（不包含密码)
+// @param email 用户email
+// @param user 用户数据指针
+func SelectUserServiceByEmail(email string, user *entity.User) *errors.MyError {
 
 	res := dao.DBClient.Model(&entity.User{}).Where("email = ?", email).Find(user)
 	//error
-	err := CreatError(res, fmt.Sprintf("the user to be deleted could not be found by email:%v", email))
+	err := CreatError(res, "select User Service by email error", fmt.Sprintf("user email:%v", email))
 
 	//不必删掉密码，还要对比
 	return err
@@ -154,15 +146,15 @@ func SelectUserServiceByEmail(email string, user *entity.User) error {
 //			    			Auth
 //**********************************************************
 
-//SelectUserIsAdmin 查询用户是否为管理员，是则返回true
+// SelectUserIsAdmin 查询用户是否为管理员，是则返回true
 func SelectUserIsAdmin(id string) (bool, error) {
 	user := map[string]interface{}{}
-	if err := SelectUserService(id, &user); err != nil {
+	if err := SelectUserServiceWithOutPassword(id, &user); err != nil {
 		return false, err
 	}
 	if isAdmin, ok2 := user["is_administrator"]; !ok2 || fmt.Sprintf("%v", isAdmin) != "1" {
 		if !ok2 {
-			log.Println("请求的用户id找不到is_administrator字段，id:%v", ok2)
+			logger.Logger.Error("请求的用户id找不到is_administrator字段", nil, 0, fmt.Sprintf("id:%v", id))
 		}
 		return false, nil
 	}
@@ -188,11 +180,41 @@ func SelectUserByPage() error {
 	return nil
 }
 
-func CountAllUser(number *int) error {
-	res := dao.DBClient.Raw(fmt.Sprintf("select count(*) from %v", entity.UserTableName)).Scan(number)
+func CountAllUser(number *int64) error {
+	res := dao.DBClient.Table(entity.UserTableName).Count(number)
 	if res.Error != nil {
-		log.Errorf(res.Error.Error())
+		logger.Logger.Error("计算所有用户数量错误", res.Error, 0, "")
 		return res.Error
 	}
 	return nil
+}
+
+//**********************************************************//
+//			    			验证用户是否存在					//
+//**********************************************************//
+
+func UserAccountIsExist(account string) (bool, error) {
+	//提前用where是因为gorm通过参数防止sql注入
+	temp := 0
+	res := dao.DBClient.Where("account=?", account).
+		Raw(fmt.Sprintf("select 1 from %v limit 1", entity.UserTableName)).Scan(&temp)
+	if res.Error != nil {
+		logger.Logger.Error("查询用户是否存在错误", res.Error,
+			0, fmt.Sprintf("account:%v", account))
+		return false, res.Error
+	}
+	return temp == 0, nil
+}
+
+func UserEmailIsExist(email string) (bool, error) {
+	//提前用where是因为gorm通过参数防止sql注入
+	temp := 0
+	res := dao.DBClient.Where("email=?", email).
+		Raw(fmt.Sprintf("select 1 from %v limit 1", entity.UserTableName)).Scan(&temp)
+	if res.Error != nil {
+		logger.Logger.Error("查询用户是否存在错误", res.Error,
+			0, fmt.Sprintf("email:%v", email))
+		return false, res.Error
+	}
+	return temp != 0, nil
 }
